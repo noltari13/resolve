@@ -25,6 +25,7 @@ export function MilestoneRow({
       <div className="flex items-center gap-3 flex-1">
         <button
           onClick={onToggleComplete}
+          aria-pressed={milestone.completed}
           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
             milestone.completed
               ? 'bg-accent-amber border-accent-amber'
