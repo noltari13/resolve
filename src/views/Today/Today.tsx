@@ -1,32 +1,39 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import { TodayFocus } from '../../components/TodayFocus'
 import { GoalCard } from '../../components/GoalCard'
-import type { Goal } from '../../types'
-import { mockGoals, getFocusActions } from './mockData'
+import { useAppStore } from '../../store/useAppStore'
 
 export function Today() {
-  const [goals, setGoals] = useState<Goal[]>(mockGoals)
+  const { goals, updateAction } = useAppStore()
 
   const handleActionComplete = useCallback((actionId: string, goalId: string) => {
-    setGoals((prev) =>
-      prev.map((goal) => {
-        if (goal.id !== goalId) return goal
+    const goal = goals.find((g) => g.id === goalId)
+    if (!goal) return
+    const action = goal.actions.find((a) => a.id === actionId)
+    if (!action) return
+    const newCurrent = Math.min(action.current + 1, action.target)
+    updateAction(goalId, actionId, newCurrent)
+  }, [goals, updateAction])
 
-        const updatedActions = goal.actions.map((action) => {
-          if (action.id !== actionId) return action
-          return { ...action, current: Math.min(action.current + 1, action.target) }
-        })
+  // Get focus actions for TodayFocus
+  const focusActions = goals.flatMap((goal) =>
+    goal.actions
+      .filter((action) => action.current < action.target)
+      .slice(0, 2)
+      .map((action) => ({
+        ...action,
+        goalId: goal.id,
+        goalTitle: goal.title,
+      }))
+  ).slice(0, 3)
 
-        const totalTarget = updatedActions.reduce((sum, a) => sum + a.target, 0)
-        const totalCurrent = updatedActions.reduce((sum, a) => sum + a.current, 0)
-        const percentage = Math.round((totalCurrent / totalTarget) * 100)
-
-        return { ...goal, actions: updatedActions, percentage }
-      })
+  if (goals.length === 0) {
+    return (
+      <div className="min-h-screen bg-bg-base pb-20 flex items-center justify-center">
+        <p className="text-text-secondary">No goals yet. Set up your cycle first!</p>
+      </div>
     )
-  }, [])
-
-  const focusActions = getFocusActions(goals)
+  }
 
   return (
     <div className="min-h-screen bg-bg-base pb-20">
