@@ -15,3 +15,24 @@ export interface Goal {
   weekHistory: WeekStatus[]
   actions: Action[]
 }
+
+export interface ReviewAction extends Action {
+  goalId: string
+  goalTitle: string
+}
+
+export interface WeekReview {
+  weekNumber: number
+  weekStart: string
+  score: number
+  completedAt: string | null
+}
+
+export interface PlanAction {
+  id: string
+  goalId: string
+  goalTitle: string
+  title: string
+  target: number
+  enabled: boolean
+}
