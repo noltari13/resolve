@@ -6,7 +6,11 @@ import { WeeklyReview } from '../WeeklyReview'
 import { useAppStore } from '../../store/useAppStore'
 import type { DashboardGoal } from '../../types'
 
-export function Dashboard() {
+interface DashboardProps {
+  onSelectGoal?: (goalId: string) => void
+}
+
+export function Dashboard({ onSelectGoal }: DashboardProps) {
   const { cycle, goals } = useAppStore()
   const [showReviewPrompt, setShowReviewPrompt] = useState(true)
   const [showWeeklyReview, setShowWeeklyReview] = useState(false)
@@ -54,7 +58,11 @@ export function Dashboard() {
             </div>
           ) : (
             dashboardGoals.map((goal) => (
-              <DashboardGoalCard key={goal.id} goal={goal} />
+              <DashboardGoalCard
+                key={goal.id}
+                goal={goal}
+                onTap={() => onSelectGoal?.(goal.id)}
+              />
             ))
           )}
         </div>
