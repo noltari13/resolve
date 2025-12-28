@@ -14,6 +14,7 @@ export interface Goal {
   percentage: number
   weekHistory: WeekStatus[]
   actions: Action[]
+  milestones?: Milestone[]
 }
 
 export interface ReviewAction extends Action {
