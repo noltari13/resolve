@@ -3,6 +3,7 @@ import { StepIndicator } from '../../components/StepIndicator'
 import { ReviewStep } from './steps/ReviewStep'
 import { ScoreStep } from './steps/ScoreStep'
 import { PlanStep } from './steps/PlanStep'
+import { DoneStep } from './steps/DoneStep'
 import { mockReviewActions, mockPlanActions } from './mockData'
 import type { ReviewAction, PlanAction } from '../../types'
 
@@ -49,6 +50,14 @@ export function WeeklyReview() {
     else if (step === 'plan') setStep('done')
   }
 
+  const handleBackToToday = () => {
+    // For now, just reset to review step
+    // Later this will navigate to Today view
+    setStep('review')
+    setReviewActions(mockReviewActions)
+    setPlanActions(mockPlanActions)
+  }
+
   return (
     <div className="min-h-screen bg-bg-base">
       <div className="max-w-lg mx-auto px-4 py-6 flex flex-col min-h-screen">
@@ -81,7 +90,7 @@ export function WeeklyReview() {
             />
           )}
           {step === 'done' && (
-            <div className="text-text-primary text-center">Done step placeholder</div>
+            <DoneStep nextWeekNumber={5} onBackToToday={handleBackToToday} />
           )}
         </div>
       </div>
