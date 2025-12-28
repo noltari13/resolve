@@ -2,11 +2,15 @@ import { useState, useCallback } from 'react'
 import { TopBar } from '../../components/TopBar'
 import { TodayFocus } from '../../components/TodayFocus'
 import { GoalCard } from '../../components/GoalCard'
+import { ReviewPrompt } from '../../components/ReviewPrompt'
+import { WeeklyReview } from '../WeeklyReview'
 import type { Goal } from '../../types'
 import { mockGoals, getFocusActions } from './mockData'
 
 export function Today() {
   const [goals, setGoals] = useState<Goal[]>(mockGoals)
+  const [showReviewPrompt, setShowReviewPrompt] = useState(true)
+  const [showWeeklyReview, setShowWeeklyReview] = useState(false)
 
   const handleActionComplete = useCallback((actionId: string, goalId: string) => {
     setGoals((prev) =>
@@ -18,7 +22,6 @@ export function Today() {
           return { ...action, current: Math.min(action.current + 1, action.target) }
         })
 
-        // Recalculate percentage
         const totalTarget = updatedActions.reduce((sum, a) => sum + a.target, 0)
         const totalCurrent = updatedActions.reduce((sum, a) => sum + a.current, 0)
         const percentage = Math.round((totalCurrent / totalTarget) * 100)
@@ -30,10 +33,26 @@ export function Today() {
 
   const focusActions = getFocusActions(goals)
 
+  // If showing weekly review, render that instead
+  if (showWeeklyReview) {
+    return <WeeklyReview />
+  }
+
   return (
     <div className="min-h-screen bg-bg-base">
       <div className="max-w-lg mx-auto">
         <TopBar />
+
+        {/* Review Prompt */}
+        {showReviewPrompt && (
+          <div className="px-4 pb-4">
+            <ReviewPrompt
+              weekNumber={4}
+              onReviewNow={() => setShowWeeklyReview(true)}
+              onLater={() => setShowReviewPrompt(false)}
+            />
+          </div>
+        )}
 
         {/* Sticky Focus Section */}
         <div className="sticky top-0 z-10 bg-bg-base px-4 pb-4">
