@@ -36,3 +36,25 @@ export interface PlanAction {
   target: number
   enabled: boolean
 }
+
+export interface Cycle {
+  id: string
+  name: string
+  startDate: string
+  endDate: string
+  durationWeeks: number
+  currentWeek: number
+  status: 'active' | 'completed' | 'abandoned'
+}
+
+export interface Milestone {
+  id: string
+  goalId: string
+  title: string
+  completed: boolean
+  completedAt: string | null
+}
+
+export interface DashboardGoal extends Goal {
+  milestones: Milestone[]
+}
