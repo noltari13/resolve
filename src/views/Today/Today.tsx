@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-import { TopBar } from '../../components/TopBar'
 import { TodayFocus } from '../../components/TodayFocus'
 import { GoalCard } from '../../components/GoalCard'
 import { ReviewPrompt } from '../../components/ReviewPrompt'
@@ -39,9 +38,8 @@ export function Today() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-base">
+    <div className="min-h-screen bg-bg-base pb-20">
       <div className="max-w-lg mx-auto">
-        <TopBar />
 
         {/* Review Prompt */}
         {showReviewPrompt && (
