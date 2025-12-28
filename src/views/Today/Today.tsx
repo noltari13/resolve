@@ -3,7 +3,11 @@ import { TodayFocus } from '../../components/TodayFocus'
 import { GoalCard } from '../../components/GoalCard'
 import { useAppStore } from '../../store/useAppStore'
 
-export function Today() {
+interface TodayProps {
+  onSelectGoal?: (goalId: string) => void
+}
+
+export function Today({ onSelectGoal }: TodayProps) {
   const { goals, updateAction } = useAppStore()
 
   const handleActionComplete = useCallback((actionId: string, goalId: string) => {
@@ -53,6 +57,7 @@ export function Today() {
               key={goal.id}
               goal={goal}
               onActionComplete={(actionId) => handleActionComplete(actionId, goal.id)}
+              onTap={() => onSelectGoal?.(goal.id)}
             />
           ))}
         </div>
