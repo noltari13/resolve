@@ -17,8 +17,36 @@ interface TodayFocusProps {
 export function TodayFocus({ actions, onActionComplete }: TodayFocusProps) {
   const incompleteActions = actions.filter((a) => a.current < a.target)
   const count = incompleteActions.length
+  const allComplete = actions.length > 0 && count === 0
 
-  if (count === 0) {
+  if (allComplete) {
+    return (
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="bg-bg-surface rounded-card p-6 text-center"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+          className="w-12 h-12 mx-auto mb-3 rounded-full bg-accent-amber/20 flex items-center justify-center"
+        >
+          <svg className="w-6 h-6 text-accent-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </motion.div>
+        <p className="text-text-primary font-display font-semibold">
+          You showed up today.
+        </p>
+        <p className="text-text-secondary text-sm mt-1">
+          All actions complete
+        </p>
+      </motion.div>
+    )
+  }
+
+  if (actions.length === 0) {
     return (
       <div className="bg-bg-surface rounded-card p-4 text-center">
         <p className="text-text-secondary">
