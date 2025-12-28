@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { StepIndicator } from '../../components/StepIndicator'
 import { ReviewStep } from './steps/ReviewStep'
+import { ScoreStep } from './steps/ScoreStep'
 import { mockReviewActions } from './mockData'
 import type { ReviewAction } from '../../types'
 
@@ -44,7 +45,7 @@ export function WeeklyReview() {
             />
           )}
           {step === 'score' && (
-            <div className="text-text-primary text-center">Score step placeholder</div>
+            <ScoreStep weekNumber={4} actions={actions} onContinue={handleNext} />
           )}
           {step === 'plan' && (
             <div className="text-text-primary text-center">Plan step placeholder</div>
