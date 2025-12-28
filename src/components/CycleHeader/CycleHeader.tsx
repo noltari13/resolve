@@ -34,7 +34,14 @@ export function CycleHeader({ cycle }: CycleHeaderProps) {
 
       {/* Progress bar */}
       <div className="mt-4">
-        <div className="h-2 bg-bg-base rounded-full overflow-hidden">
+        <div
+          role="progressbar"
+          aria-valuenow={Math.round(progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Cycle progress: Week ${cycle.currentWeek} of ${cycle.durationWeeks}`}
+          className="h-2 bg-bg-base rounded-full overflow-hidden"
+        >
           <div
             className="h-full bg-accent-amber rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
