@@ -1,14 +1,21 @@
 import { useCallback } from 'react'
 import { TodayFocus } from '../../components/TodayFocus'
 import { GoalCard } from '../../components/GoalCard'
+import { ReviewPrompt } from '../../components/ReviewPrompt'
 import { useAppStore } from '../../store/useAppStore'
 
 interface TodayProps {
   onSelectGoal?: (goalId: string) => void
+  onStartReview?: () => void
 }
 
-export function Today({ onSelectGoal }: TodayProps) {
+export function Today({ onSelectGoal, onStartReview }: TodayProps) {
   const { goals, updateAction } = useAppStore()
+  const currentWeek = useAppStore((state) => state.currentWeek)
+  const lastReviewedWeek = useAppStore((state) => state.lastReviewedWeek)
+
+  // Show review prompt if we haven't reviewed the current week
+  const showReviewPrompt = lastReviewedWeek !== currentWeek
 
   const handleActionComplete = useCallback((actionId: string, goalId: string) => {
     const goal = goals.find((g) => g.id === goalId)
@@ -42,6 +49,17 @@ export function Today({ onSelectGoal }: TodayProps) {
   return (
     <div className="min-h-screen bg-bg-base pb-20">
       <div className="max-w-lg mx-auto">
+        {/* Review Prompt */}
+        {showReviewPrompt && onStartReview && (
+          <div className="px-4 pt-4">
+            <ReviewPrompt
+              weekNumber={currentWeek}
+              onReviewNow={onStartReview}
+              onLater={() => {/* Could track dismissal, for now just hide */}}
+            />
+          </div>
+        )}
+
         {/* Sticky Focus Section */}
         <div className="sticky top-0 z-10 bg-bg-base px-4 pb-4">
           <TodayFocus
