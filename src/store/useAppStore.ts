@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Action, Cycle, Goal, Milestone } from '../types'
+import type { Action, Cycle, Goal, Milestone, WeekStatus } from '../types'
 
 interface AppState {
   // Onboarding
@@ -9,6 +9,10 @@ interface AppState {
   // Data
   cycle: Cycle | null
   goals: Goal[]
+
+  // Review state
+  currentWeek: number
+  lastReviewedWeek: number | null
 
   // Actions
   setCycle: (cycle: Cycle) => void
@@ -23,12 +27,18 @@ interface AppState {
   deleteMilestone: (goalId: string, milestoneId: string) => void
   completeOnboarding: () => void
   resetStore: () => void
+
+  // Review actions
+  completeWeeklyReview: (weekNumber: number) => void
+  resetActionsForNewWeek: () => void
 }
 
 const initialState = {
   hasCompletedOnboarding: false,
   cycle: null,
   goals: [],
+  currentWeek: 1,
+  lastReviewedWeek: null,
 }
 
 export const useAppStore = create<AppState>()(
@@ -126,6 +136,32 @@ export const useAppStore = create<AppState>()(
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
 
       resetStore: () => set(initialState),
+
+      completeWeeklyReview: (weekNumber) =>
+        set((state) => ({
+          lastReviewedWeek: weekNumber,
+          // Update week history for all goals based on their percentage
+          goals: state.goals.map((goal) => {
+            const status: WeekStatus = goal.percentage >= 75 ? 'complete' : goal.percentage >= 25 ? 'partial' : 'missed'
+            return {
+              ...goal,
+              weekHistory: [...goal.weekHistory, status].slice(-12) // Keep last 12 weeks
+            }
+          }),
+        })),
+
+      resetActionsForNewWeek: () =>
+        set((state) => ({
+          currentWeek: state.currentWeek + 1,
+          goals: state.goals.map((goal) => ({
+            ...goal,
+            percentage: 0,
+            actions: goal.actions.map((action) => ({
+              ...action,
+              current: 0,
+            })),
+          })),
+        })),
     }),
     { name: 'resolve-storage' }
   )
