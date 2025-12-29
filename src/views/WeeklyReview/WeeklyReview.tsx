@@ -4,23 +4,54 @@ import { ReviewStep } from './steps/ReviewStep'
 import { ScoreStep } from './steps/ScoreStep'
 import { PlanStep } from './steps/PlanStep'
 import { DoneStep } from './steps/DoneStep'
-import { mockReviewActions, mockPlanActions } from './mockData'
+import { useAppStore } from '../../store/useAppStore'
 import type { ReviewAction, PlanAction } from '../../types'
 
 type ReviewStepType = 'review' | 'score' | 'plan' | 'done'
 
-export function WeeklyReview() {
+interface WeeklyReviewProps {
+  onComplete: () => void
+}
+
+export function WeeklyReview({ onComplete }: WeeklyReviewProps) {
+  const goals = useAppStore((state) => state.goals)
+  const cycle = useAppStore((state) => state.cycle)
+  const currentWeek = useAppStore((state) => state.currentWeek)
+  const completeWeeklyReview = useAppStore((state) => state.completeWeeklyReview)
+  const resetActionsForNewWeek = useAppStore((state) => state.resetActionsForNewWeek)
+  const updateAction = useAppStore((state) => state.updateAction)
+
   const [step, setStep] = useState<ReviewStepType>('review')
-  const [reviewActions, setReviewActions] = useState<ReviewAction[]>(mockReviewActions)
-  const [planActions, setPlanActions] = useState<PlanAction[]>(mockPlanActions)
+
+  const reviewActions: ReviewAction[] = goals.flatMap((goal) =>
+    goal.actions.map((action) => ({
+      ...action,
+      goalId: goal.id,
+      goalTitle: goal.title,
+    }))
+  )
+
+  const [planActions, setPlanActions] = useState<PlanAction[]>(() =>
+    goals.flatMap((goal) =>
+      goal.actions.map((action) => ({
+        id: action.id,
+        goalId: goal.id,
+        goalTitle: goal.title,
+        title: action.title,
+        target: action.target,
+        enabled: true,
+      }))
+    )
+  )
 
   const stepNumber = { review: 1, score: 2, plan: 3, done: 4 }[step]
 
   const handleActionChange = useCallback((actionId: string, newCurrent: number) => {
-    setReviewActions((prev) =>
-      prev.map((a) => (a.id === actionId ? { ...a, current: newCurrent } : a))
-    )
-  }, [])
+    const action = reviewActions.find((a) => a.id === actionId)
+    if (action) {
+      updateAction(action.goalId, actionId, newCurrent)
+    }
+  }, [reviewActions, updateAction])
 
   const handleTogglePlanAction = useCallback((actionId: string) => {
     setPlanActions((prev) =>
@@ -51,12 +82,12 @@ export function WeeklyReview() {
   }
 
   const handleBackToToday = () => {
-    // For now, just reset to review step
-    // Later this will navigate to Today view
-    setStep('review')
-    setReviewActions(mockReviewActions)
-    setPlanActions(mockPlanActions)
+    completeWeeklyReview(currentWeek)
+    resetActionsForNewWeek()
+    onComplete()
   }
+
+  const weekDateRange = cycle ? `Week ${currentWeek}` : 'This Week'
 
   return (
     <div className="min-h-screen bg-bg-base">
@@ -70,19 +101,19 @@ export function WeeklyReview() {
         <div className="flex-1">
           {step === 'review' && (
             <ReviewStep
-              weekNumber={4}
-              weekDateRange="Dec 22 – Dec 28"
+              weekNumber={currentWeek}
+              weekDateRange={weekDateRange}
               actions={reviewActions}
               onActionChange={handleActionChange}
               onNext={handleNext}
             />
           )}
           {step === 'score' && (
-            <ScoreStep weekNumber={4} actions={reviewActions} onContinue={handleNext} />
+            <ScoreStep weekNumber={currentWeek} actions={reviewActions} onContinue={handleNext} />
           )}
           {step === 'plan' && (
             <PlanStep
-              weekDateRange="Dec 29 – Jan 4"
+              weekDateRange={`Week ${currentWeek + 1}`}
               actions={planActions}
               onToggleAction={handleTogglePlanAction}
               onAddAction={handleAddPlanAction}
@@ -90,7 +121,7 @@ export function WeeklyReview() {
             />
           )}
           {step === 'done' && (
-            <DoneStep nextWeekNumber={5} onBackToToday={handleBackToToday} />
+            <DoneStep nextWeekNumber={currentWeek + 1} onBackToToday={handleBackToToday} />
           )}
         </div>
       </div>

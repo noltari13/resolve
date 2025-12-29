@@ -16,7 +16,7 @@ export function Dashboard({ onSelectGoal }: DashboardProps) {
   const [showWeeklyReview, setShowWeeklyReview] = useState(false)
 
   if (showWeeklyReview) {
-    return <WeeklyReview />
+    return <WeeklyReview onComplete={() => setShowWeeklyReview(false)} />
   }
 
   // Convert goals to DashboardGoals (add empty milestones for now)
