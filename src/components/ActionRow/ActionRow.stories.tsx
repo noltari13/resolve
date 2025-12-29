@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ActionRow } from './ActionRow'
 import { useState } from 'react'
 import type { Action } from '../../types'
